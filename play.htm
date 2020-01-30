@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<style type="text/css">
+		.interface {
+			font-size: larger;
+		}
+	</style>
+	<script>
+		function init() {
+			const player = document.getElementById("player");
+			const nowPlaying = document.getElementById("nowPlaying");
+			const paused = document.getElementById("paused");
+			const muted = document.getElementById("muted");
+			const volume = document.getElementById("volume");
+			const duration = document.getElementById("duration");
+			const position = document.getElementById("position");
+			const remaining = document.getElementById("remaining");
+			const positionSlider = document.getElementById("positionSlider")
+			const volumeSlider = document.getElementById("volumeSlider")
+
+			positionSlider.max = Math.ceil(player.duration);
+			document.getElementById("positionMax").innerText = positionSlider.max;
+			updateStatus();
+		}
+
+		function updateStatus() {
+			// console.info("updateStatus()");
+			nowPlaying.innerText = player.src;
+			paused.innerText = player.paused;
+			muted.innerText = player.muted;
+			volume.innerText = player.volume;
+			volumeSlider.value = player.volume;
+			duration.innerText = Math.ceil(player.duration);
+			position.innerText = Math.ceil(player.currentTime);
+			positionSlider.value = player.currentTime;
+			remaining.innerText = Math.ceil(player.duration - player.currentTime);
+		}
+
+		function playSong(obj) {
+			if (player.src.endsWith(obj.innerText))
+				console.info("playSone(): same song selected");
+			else {
+				console.info("playSone(): change to " + obj.innerText);
+				player.src = "mp3/" + obj.innerText;
+			}
+		}
+
+		function play() {
+			console.info("play");
+			player.play();
+			updateStatus();
+		}
+
+		function pause() {
+			console.info("pause");
+			player.pause();
+			updateStatus();
+		}
+
+		function mute() {
+			player.muted = !player.muted;
+			console.info("mute: " + player.muted);
+		}
+
+		function skip(n) {
+			if (n<0)
+				toTime = Math.max(player.currentTime + n, 0);
+			else
+				toTime = Math.min(player.currentTime + n, player.duration)
+			player.currentTime = toTime;
+			console.info("skip " + n);
+		}
+
+		function endOfTrack() {
+			console.info("end of " + player.src);
+		}
+
+		function changePosition(obj) {
+			player.currentTime = obj.value;
+		}
+
+		function changeVolume(obj) {
+			player.volume = obj.value;
+		}
+	</script>
+</head>
+<body onload="init();">
+	<audio id="player"
+		src="mp3/bensound-deepblue.mp3"
+		onended="console.info('endOfTrack'); endOfTrack();"
+		onvolumechange="console.info('onvolumechange'); updateStatus();"
+		ontimeupdate="console.info('ontimeupdate'); updateStatus();"
+		onwaiting="console.info('onwaiting'); updateStatus();"
+		onpause="console.info('onpause'); updateStatus();"
+		onplaying="console.info('onplaying'); updateStatus();">
+			Your browser does not support the <code>&lt;audio&gt;</code> element.
+	</audio>
+	<div>status</div>
+	<div>
+		song: <span id="nowPlaying"></span><br/>
+		paused: <span id="paused"></span><br/>
+		muted: <span id="muted"></span><br/>
+		volume: <span id="volume"></span>
+			<input type="range" id="volumeSlider" min="0" max="1" value="1" step="0.05"
+				onchange="changeVolume(this);"><br/>
+		duration: <span id="duration"></span><br/>
+		position: <span id="position"></span>
+			0 <input type="range" id="positionSlider" min="0" max="1" value="0" step="1"
+				onchange="changePosition(this);"><br/> <span id="positionMax"></span>
+		remaining: <span id="remaining"></span><br/>
+	<div>controls</div>
+	<dl class="interface">
+		<li onclick="play();">play</li>
+		<li onclick="pause();">pause</li>
+		<li onclick="mute();">un/mute</li>
+		<li>previous</li>
+		<li>next</li>
+		<li onclick="skip(-10);">-10s</li>
+		<li onclick="skip(-5);">-5s</li>
+		<li onclick="skip(-1);">-1s</li>
+		<li onclick="skip(1);">+1s</li>
+		<li onclick="skip(5);">+5s</li>
+		<li onclick="skip(10);">+10s</li>
+	</dl>
+
+	<p>files</p>
+	<dl>
+		<li onclick="playSong(this);">bensound-deepblue.mp3</li>
+		<li onclick="playSong(this);">bensound-epic.mp3</li>
+		<li onclick="playSong(this);">bensound-memories.mp3</li>
+	</dl>
+
+</body>
+</html>
